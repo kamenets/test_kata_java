@@ -1,0 +1,93 @@
+import java.util.Scanner;
+
+class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Введите арифметическое выражение: ");
+        String input = scanner.nextLine();
+        
+        try {
+            String result = calc(input);
+            System.out.println("Результат: " + result);
+        } catch (Exception e) {
+            System.out.println("Ошибка: " + e.getMessage());
+        }
+    }
+
+    static String calc(String input) {
+        input = input.trim();
+        String[] parts = input.split(" ");
+        
+        if (parts.length != 3) {
+            throw new IllegalArgumentException("Некорректное выражение");
+        }
+        
+        int number1;
+        int number2;
+        try {
+            number1 = convertToArabic(parts[0]);
+            number2 = convertToArabic(parts[2]);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Некорректные числа");
+        }
+
+        if ((number1 < 1 || number1 > 10) || (number2 < 1 || number2 > 10)) {
+            throw new IllegalArgumentException("Числа должны быть от 1 до 10 включительно");
+        }
+
+        int result;
+        switch (parts[1]) {
+            case "+":
+                result = number1 + number2;
+                break;
+            case "-":
+                result = number1 - number2;
+                break;
+            case "*":
+                result = number1 * number2;
+                break;
+            case "/":
+                result = number1 / number2;
+                break;
+            default:
+                throw new IllegalArgumentException("Некорректная операция");
+        }
+
+        if (result < 1) {
+            throw new IllegalArgumentException("Результат должен быть положительным");
+        }
+
+        return convertToRoman(result);
+    }
+
+    static int convertToArabic(String input) {
+        try {
+            return Integer.parseInt(input);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Некорректное арабское число");
+        }
+    }
+
+    static String convertToRoman(int number) {
+        if (number < 1 || number > 3999) {
+            throw new IllegalArgumentException("Число должно быть в диапазоне от 1 до 3999");
+        }
+
+        String[] romanDigits = {"I", "IV", "V", "IX", "X", "XL", "L", "XC","C", "CD", "D", "CM", "M"};
+        int[] arabicValues = {1,4,5,9,10,40,50,90,100,400,500,900,1000};
+        StringBuilder result = new StringBuilder();
+
+        int i = 12;
+        while (number > 0) {
+            int div = number / arabicValues[i];
+            number %= arabicValues[i];
+            while (div > 0) {
+                result.append(romanDigits[i]);
+                div--;
+            }
+            i--;
+        }
+
+        return result.toString();
+    }
+}
